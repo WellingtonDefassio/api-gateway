@@ -1,17 +1,41 @@
 server:
   port: 8082
 
+
 spring:
   cloud:
     gateway:
       routes:
         - id: users-status-check
-          uri: http://localhost:8081
+          uri: lb://api-using-keycloak
           predicates:
             - Path=/users/status/check
             - Method=GET
           filters:
             - RemoveRequestHeader=Cookie
+        - id: api-albums
+          uri: lb://api-albums
+          predicates:
+            - Path=/albums
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+        add-to-simple-url-handler-mapping: true
+
+  application:
+    name: ms-gateway
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8010/eureka
+
 
 
 
